@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notre Constellation d'Amour 💫</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:wght@300;400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: #0a0a1a;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* ÉCRAN DE CONNEXION */
+        #loginScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a1a2e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        #loginScreen.hidden {
+            opacity: 0;
+            transform: scale(1.5);
+            pointer-events: none;
+        }
+
+        .login-container {
+            text-align: center;
+            padding: 60px 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .login-title {
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #ff6ec7, #ffb347, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+
+        .login-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            opacity: 0.8;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 18px 25px;
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            color: #fff;
+            text-align: center;
+            font-family: 'Cormorant Garamond', serif;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: #ff6ec7;
+            box-shadow: 0 0 30px rgba(255, 110, 199, 0.5);
+        }
+
+        .password-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, #ff6ec7, #7873f5);
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(255, 110, 199, 0.4);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 110, 199, 0.6);
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            margin-top: 15px;
+            font-size: 1.1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .error-message.show {
+            opacity: 1;
+        }
+
+        /* CANVAS ÉTOILES */
+        #starsCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* CONTENU PRINCIPAL */
+        .main-content {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+
+        .main-content.visible {
+            opacity: 1;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            padding: 80px 20px 40px;
+        }
+
+        .main-title {
+            font-family: 'Cinzel', serif;
+            font-size: 4.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #ff6ec7, #ffb347, #ffd700, #ff6ec7);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 5s ease infinite;
+            text-shadow: 0 0 30px rgba(255, 110, 199, 0.5);
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .relationship-info {
+            font-size: 1.3rem;
+            opacity: 0.7;
+            margin-top: 20px;
+        }
+
+        /* LUNE CENTRALE */
+        .moon-container {
+            display: flex;
+            justify-content: center;
+            margin: 60px 0;
+            position: relative;
+        }
+
+        .moon {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #fff8dc 100%);
+            box-shadow: 0 0 80px rgba(255, 215, 0, 0.6),
+                        inset -20px -20px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+            animation: moonGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes moonGlow {
+            0%, 100% { 
+                box-shadow: 0 0 80px rgba(255, 215, 0, 0.6),
+                            inset -20px -20px 40px rgba(0, 0, 0, 0.2);
+            }
+            50% { 
+                box-shadow: 0 0 120px rgba(255, 215, 0, 0.9),
+                            inset -20px -20px 40px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        .moon-phase {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            font-family: 'Cinzel', serif;
+            color: #333;
+            text-align: center;
+        }
+
+        .days-together {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        /* CONSTELLATION */
+        .constellation-map {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            min-height: 800px;
+        }
+
+        .constellation-title {
+            text-align: center;
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            margin-bottom: 60px;
+            color: #ffd700;
+        }
+
+        /* ÉTOILES */
+        .star {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .star:hover {
+            transform: scale(1.5) !important;
+            filter: brightness(1.5);
+            z-index: 100;
+        }
+
+        .star svg {
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+
+        /* MODAL SOUVENIR */
+        .memory-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .memory-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .memory-content {
+            background: linear-gradient(135deg, rgba(26, 10, 46, 0.95), rgba(10, 26, 46, 0.95));
+            border-radius: 30px;
+            padding: 50px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 2px solid rgba(255, 110, 199, 0.3);
+            box-shadow: 0 30px 100px rgba(255, 110, 199, 0.4);
+            transform: scale(0.8);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .memory-modal.active .memory-content {
+            transform: scale(1);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 3rem;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .close-modal:hover {
+            transform: rotate(90deg);
+            background: rgba(255, 110, 199, 0.3);
+        }
+
+        .memory-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .memory-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #ffd700;
+            text-align: center;
+        }
+
+        .memory-description {
+            font-size: 1.5rem;
+            line-height: 1.8;
+            text-align: center;
+            color: #fff;
+            opacity: 0.9;
+        }
+
+        /* MESSAGES SECTION */
+        .messages-section {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 40px 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-family: 'Cinzel', serif;
+            font-size: 3.5rem;
+            margin-bottom: 50px;
+            color: #ff6ec7;
+        }
+
+        .shooting-star-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 40px;
+            border: 2px solid rgba(255, 110, 199, 0.2);
+        }
+
+        .love-message {
+            background: linear-gradient(135deg, rgba(255, 110, 199, 0.1), rgba(120, 115, 245, 0.1));
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            border-left: 5px solid #ff6ec7;
+            transition: all 0.3s ease;
+        }
+
+        .love-message:hover {
+            transform: translateX(10px);
+            box-shadow: 0 10px 40px rgba(255, 110, 199, 0.3);
+        }
+
+        .message-text {
+            font-size: 1.4rem;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .message-author {
+            text-align: right;
+            font-style: italic;
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.3rem;
+            opacity: 0.7;
+        }
+
+        /* SHOOTING STARS */
+        .shooting-star {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #fff;
+            animation: shoot 3s linear;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @keyframes shoot {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-300px, 300px);
+                opacity: 0;
+            }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1.3rem;
+            }
+
+            .moon {
+                width: 150px;
+                height: 150px;
+            }
+
+            .constellation-title {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+            }
+
+            .memory-content {
+                padding: 30px;
+            }
+
+            .memory-title {
+                font-size: 2rem;
+            }
+
+            .login-title {
+                font-size: 2rem;
+            }
+
+            .login-container {
+                padding: 40px 25px;
+            }
+        }
+
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ff6ec7, #7873f5);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ÉCRAN DE CONNEXION -->
+    <div id="loginScreen">
+        <div class="login-container">
+            <h1 class="login-title">✨ Notre Univers ✨</h1>
+            <p class="login-subtitle">Entre notre code secret pour accéder à notre constellation</p>
+            <input 
+                type="password" 
+                id="passwordInput" 
+                class="password-input" 
+                placeholder="🔒 Mot de passe"
+                onkeypress="handleKeyPress(event)"
+            >
+            <button class="login-btn" onclick="checkPassword()">Entrer dans notre galaxie 🌌</button>
+            <p class="error-message" id="errorMessage">❌ Code incorrect, essaie encore mon amour...</p>
+        </div>
+    </div>
+
+    <!-- CANVAS ÉTOILES -->
+    <canvas id="starsCanvas"></canvas>
+
+    <!-- CONTENU PRINCIPAL -->
+    <div class="main-content" id="mainContent">
+        <!-- HEADER -->
+        <header>
+            <h1 class="main-title">Notre Constellation d'Amour</h1>
+            <p class="subtitle">Brunel Junior & Fanya</p>
+            <p class="subtitle">💫 Chaque étoile raconte notre histoire 💫</p>
+            <div class="relationship-info">
+                <p id="relationshipTime">Notre univers depuis...</p>
+            </div>
+        </header>
+
+        <!-- LUNE CENTRALE -->
+        <div class="moon-container">
+            <div class="moon">
+                <div class="moon-phase">
+                    <div class="days-together" id="daysCount">0</div>
+                    <div>jours ensemble</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARTE DES ÉTOILES -->
+        <div class="constellation-map">
+            <h2 class="constellation-title">✨ Nos Souvenirs Stellaires ✨</h2>
+            <div id="starsContainer"></div>
+        </div>
+
+        <!-- MESSAGES D'AMOUR -->
+        <section class="messages-section">
+            <h2 class="section-title">💌 Messages d'Étoiles Filantes 💌</h2>
+            <div class="shooting-star-container">
+                <div class="love-message">
+                    <p class="message-text">"Tu es la lumière qui guide mon chemin dans l'obscurité. Chaque jour avec toi est une nouvelle étoile dans notre ciel."</p>
+                    <p class="message-author">— Brunel Junior ❤️</p>
+                </div>
+                <div class="love-message">
+                    <p class="message-text">"Peu importe la distance entre nous, nous regardons les mêmes étoiles. Tu es ma galaxie entière."</p>
+                    <p class="message-author">— Ton amour éternel 💫</p>
+                </div>
+                <div class="love-message">
+                    <p class="message-text">"Si je pouvais t'offrir une étoile pour chaque fois que tu me fais sourire, le ciel entier t'appartiendrait."</p>
+                    <p class="message-author">— Pour toujours tien 🌟</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <p>✨ Notre amour brille plus fort que toutes les étoiles de l'univers ✨</p>
+            <p style="margin-top: 20px; font-size: 1.1rem;">Créé avec 💖 pour Fanya</p>
+        </footer>
+    </div>
+
+    <!-- MODAL SOUVENIR -->
+    <div class="memory-modal" id="memoryModal">
+        <div class="memory-content">
+            <span class="close-modal" onclick="closeModal()">×</span>
+            <img class="memory-image" id="modalImage" src="" alt="Souvenir">
+            <h2 class="memory-title" id="modalTitle"></h2>
+            <p class="memory-description" id="modalDescription"></p>
+        </div>
+    </div>
+
+    <script>
+        // MOT DE PASSE (Change-le avec votre date spéciale ou code secret)
+        const SECRET_PASSWORD = "fanya2025"; // ← CHANGE CE MOT DE PASSE !
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                checkPassword();
+            }
+        }
+
+        function checkPassword() {
+            const input = document.getElementById('passwordInput').value;
+            const errorMsg = document.getElementById('errorMessage');
+            
+            if (input === SECRET_PASSWORD) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                setTimeout(() => {
+                    document.getElementById('mainContent').classList.add('visible');
+                    initializeStars();
+                    calculateDaysTogether();
+                }, 1000);
+            } else {
+                errorMsg.classList.add('show');
+                document.getElementById('passwordInput').value = '';
+                setTimeout(() => {
+                    errorMsg.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // CANVAS ÉTOILES SCINTILLANTES
+        const canvas = document.getElementById('starsCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Star {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2;
+                this.speed = Math.random() * 0.5;
+                this.opacity = Math.random();
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            update() {
+                this.opacity += (Math.random() - 0.5) * 0.02;
+                this.opacity = Math.max(0, Math.min(1, this.opacity));
+            }
+        }
+
+        const backgroundStars = [];
+        for (let i = 0; i < 200; i++) {
+            backgroundStars.push(new Star());
+        }
+
+        function animateStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            backgroundStars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+            requestAnimationFrame(animateStars);
+        }
+
+        animateStars();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // CALCUL JOURS ENSEMBLE
+        function calculateDaysTogether() {
+            // CHANGE CETTE DATE avec votre vraie date de début de relation
+            const startDate = new Date('2024-01-01'); // ← CHANGE CETTE DATE !
+            const today = new Date();
+            const diffTime = Math.abs(today - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            document.getElementById('daysCount').textContent = diffDays;
+            document.getElementById('relationshipTime').innerHTML = 
+                `Notre univers depuis le <strong>${startDate.toLocaleDateString('fr-FR', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                })}</strong>`;
+        }
+
+        // DONNÉES DES SOUVENIRS (vos photos + descriptions)
+        const memories = [
+            {
+                image: '/mnt/user-data/uploads/1000425644.jpg',
+                title: 'Ta Beauté Éblouissante 🌺',
+                description: 'Ce jour-là, tu rayonnais comme une étoile. Ton sourire illuminait tout autour de toi, et j\'ai su que tu étais la plus belle constellation de ma vie.',
+                color: '#ff6ec7'
+            },
+            {
+                image: '/mnt/user-data/uploads/1000425562.jpg',
+                title: 'Notre Première Complicité 💑',
+                description: 'Le moment où nos regards se sont croisés et où nous avons compris que nous étions faits l\'un pour l\'autre. Cette connexion instantanée qui a changé nos vies.',
+                color: '#7873f5'
+            },
+            {
+                image: '/mnt/user-data/uploads/1000425575.jpg',
+                title: 'Nos Fous Rires Cosmiques 😄',
+                description: 'Ce souvenir de nous riant ensemble sans raison. C\'est dans ces moments simples que notre amour brille le plus fort.',
+                color: '#ffd700'
+            },
+            {
+                image: '/mnt/user-data/uploads/1000425569.jpg',
+                title: 'Main Dans La Main 💫',
+                description: 'Chaque fois que je tiens ta main, je sens que rien ne peut nous séparer. Tu es mon ancre dans cet univers infini.',
+                color: '#ff6ec7'
+            },
+            {
+                image: '/mnt/user-data/uploads/1000425557.jpg',
+                title: 'Nos Moments Complices ✨',
+                description: 'Ces instants où seuls nos regards suffisent à tout dire. Notre langage secret que personne d\'autre ne comprend.',
+                color: '#7873f5'
+            },
+            {
+                image: '/mnt/user-data/uploads/1000425554.jpg',
+                title: 'Notre Connexion Profonde 💕',
+                description: 'Plus qu\'une photo, c\'est le reflet de l\'amour pur que nous partageons. Chaque seconde ensemble est précieuse.',
+                color: '#ffd700'
+            },
+            {
+                image: '/mnt/user-data/uploads/1000425540.jpg',
+                title: 'Ton Style Unique 👑',
+                description: 'Tu es magnifique dans tout ce que tu portes, mais c\'est ton cœur qui te rend vraiment exceptionnelle.',
+                color: '#ff6ec7'
+            },
+            {
+                image: '/mnt/user-data/uploads/1000425650.jpg',
+                title: 'Ton Regard Qui M\'émerveille 😍',
+                description: 'Dans tes yeux, je vois toutes les étoiles de l\'univers. Tu es mon infini, ma galaxie, mon tout.',
+                color: '#7873f5'
+            }
+        ];
+
+        // CRÉER LES ÉTOILES INTERACTIVES
+        function initializeStars() {
+            const container = document.getElementById('starsContainer');
+            const containerWidth = container.offsetWidth;
+            const containerHeight = 800;
+
+            memories.forEach((memory, index) => {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // Positions aléatoires mais espacées
+                const x = (index % 4) * 25 + Math.random() * 15 + 5;
+                const y = Math.floor(index / 4) * 30 + Math.random() * 20 + 10;
+                
+                star.style.left = x + '%';
+                star.style.top = y + '%';
+                star.style.color = memory.color;
+                star.style.animationDelay = (index * 0.2) + 's';
+                
+                const size = 40 + Math.random() * 20;
+                star.innerHTML = `
+                    <svg width="${size}" height="${size}" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M12 2l2.4 7.4h7.8l-6.3 4.6 2.4 7.4-6.3-4.6-6.3 4.6 2.4-7.4-6.3-4.6h7.8z"/>
+                    </svg>
+                `;
+                
+                star.onclick = () => openMemory(index);
+                container.appendChild(star);
+            });
+        }
+
+        // OUVRIR UN SOUVENIR
+        function openMemory(index) {
+            const memory = memories[index];
+            const modal = document.getElementById('memoryModal');
+            
+            document.getElementById('modalImage').src = memory.image;
+            document.getElementById('modalTitle').textContent = memory.title;
+            document.getElementById('modalDescription').textContent = memory.description;
+            
+            modal.classList.add('active');
+            
+            // Créer des étoiles filantes
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => createShootingStar(), i * 300);
+            }
+        }
+
+        // FERMER MODAL
+        function closeModal() {
+            document.getElementById('memoryModal').classList.remove('active');
+        }
+
+        // ÉTOILES FILANTES
+        function createShootingStar() {
+            const star = document.createElement('div');
+            star.className = 'shooting-star';
+            star.style.left = Math.random() * window.innerWidth + 'px';
+            star.style.top = Math.random() * (window.innerHeight / 2) + 'px';
+            document.body.appendChild(star);
+            
+            setTimeout(() => star.remove(), 3000);
+        }
+
+        // Créer des étoiles filantes régulièrement
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                createShootingStar();
+            }
+        }, 3000);
+
+        // Fermer modal en cliquant à l'extérieur
+        document.getElementById('memoryModal').addEventListener('click', (e) => {
+            if (e.target.id === 'memoryModal') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
