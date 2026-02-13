@@ -1340,3 +1340,240 @@ function loadSessionResults(session) {
   document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
   displayResults(session.score);
   }
+  // ============================================================================
+// MODULE 7 : RÉSULTATS ET ACTIONS INTIMES
+// ============================================================================
+
+function calculateScoreFromAnswers(ans1, ans2) {
+  let score = 0, total = 0;
+  
+  questions.forEach(q => {
+    const a1 = (ans1[q.id] || "").toLowerCase().trim();
+    const a2 = (ans2[q.id] || "").toLowerCase().trim();
+    
+    if (a1 === a2) score++;
+    total++;
+  });
+  
+  return total > 0 ? Math.round((score / total) * 100) : 0;
+}
+
+function calculateResults() {
+  let score = 0, total = 0, comparisonHtml = [];
+  let selfMatches = 0, partnerMatches = 0, bothMatches = 0;
+  let selfTotal = 0, partnerTotal = 0, bothTotal = 0;
+
+  questions.forEach(q => {
+    const a1 = (answers1[q.id] || "").toLowerCase().trim();
+    const a2 = (answers2[q.id] || "").toLowerCase().trim();
+    let match = a1 === a2;
+    
+    if (q.about === 'both') {
+      bothTotal++;
+      if (match) { bothMatches++; score++; }
+      total++;
+    } else if (q.about === 'self') {
+      selfTotal++;
+      if (match) { selfMatches++; score++; }
+      total++;
+    } else if (q.about === 'partner') {
+      partnerTotal++;
+      if (match) { partnerMatches++; score++; }
+      total++;
+    }
+    
+    comparisonHtml.push(`
+      <div class="comparison-item">
+        <div class="comparison-question">${escapeHtml(q.text)}</div>
+        <div class="comparison-answers">
+          <div class="answer-box ${match ? 'answer-correct' : 'answer-incorrect'}">
+            <div class="answer-label">${escapeHtml(partner1)}</div>
+            <div>${escapeHtml(answers1[q.id] || '?')}</div>
+          </div>
+          <div class="answer-box ${match ? 'answer-correct' : 'answer-incorrect'}">
+            <div class="answer-label">${escapeHtml(partner2)}</div>
+            <div>${escapeHtml(answers2[q.id] || '?')}</div>
+          </div>
+        </div>
+      </div>
+    `);
+  });
+
+  const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
+  
+  saveScore(percentage, selectedMode);
+  
+  // Envoyer à Firebase
+  if (selectedMode === 'ensemble') {
+    sendToFirebase({
+      modeJeu: 'ensemble',
+      partenaire1: partner1,
+      partenaire2: partner2,
+      nombreQuestions: selectedQuestionCount,
+      niveau: selectedQuestionCount === 20 ? 'Débutant' : 
+              selectedQuestionCount === 50 ? 'Intermédiaire' :
+              selectedQuestionCount === 100 ? 'Avancé' : 'Extrême',
+      score: percentage,
+      aJoueActionsIntimes: false
+    });
+  }
+  
+  displayResults(percentage, comparisonHtml);
+}
+
+function displayResults(percentage, comparisonHtml = []) {
+  document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+  document.getElementById('resultsScreen').classList.remove('hidden');
+  document.getElementById('scoreDisplay').textContent = percentage + '%';
+
+  let message = 
+    percentage >= 90 ? '🔥 Incroyable ! Vous êtes fusionnels ! 🔥' :
+    percentage >= 70 ? '💖 Excellente complicité ! Vous vous connaissez très bien ! 💖' :
+    percentage >= 50 ? '💕 Pas mal ! Il y a encore des choses à découvrir… 💕' :
+    percentage >= 30 ? '💜 Un bon début ! Vous pouvez déjà passer aux actions intimes 😏' :
+    '💗 Il reste beaucoup à explorer l\'un sur l\'autre ! 💗';
+
+  document.getElementById('resultMessage').textContent = message;
+
+  document.getElementById('comparisonContainer').innerHTML = comparisonHtml.length ? `
+    <h2 style="margin:40px 0 20px;">📋 Comparaison des réponses</h2>
+    ${comparisonHtml.join('')}
+  ` : '';
+
+  if (percentage >= 30) {
+    showIntimateOffer();
+  }
+}
+
+function showIntimateOffer() {
+  const offerDiv = document.getElementById('bonusGameOffer');
+  const choiceDiv = document.getElementById('intimateTypeChoice');
+  
+  offerDiv.classList.remove('hidden');
+  
+  if (selectedMode === 'distance') {
+    choiceDiv.innerHTML = `
+      <button class="btn btn-primary" onclick="startIntimateGame('virtual')">
+        💻 Actions virtuelles maintenant
+      </button>
+      <button class="btn btn-secondary" onclick="startIntimateGame('physical')">
+        💑 Actions pour nos retrouvailles
+      </button>
+    `;
+  } else {
+    choiceDiv.innerHTML = `
+      <button class="btn btn-primary" onclick="startIntimateGame('physical')">
+        Jouer les 10 actions 🔥
+      </button>
+    `;
+  }
+}
+
+function startIntimateGame(type = 'physical') {
+  intimateActionType = type;
+  currentActionIndex = 0;
+  hasPlayedIntimateActions = true;
+  
+  document.getElementById('resultsScreen').classList.add('hidden');
+  document.getElementById('intimateGameScreen').classList.remove('hidden');
+  
+  const label = document.getElementById('intimateTypeLabel');
+  if (type === 'virtual') {
+    label.textContent = '📱 Mode Virtuel - À faire en vidéo/message';
+  } else if (selectedMode === 'distance') {
+    label.textContent = '💑 À faire lors de vos retrouvailles';
+  } else {
+    label.textContent = '👫 Actions à faire ensemble maintenant';
+  }
+  
+  showIntimateAction();
+}
+
+function showIntimateAction() {
+  if (currentActionIndex >= 10) {
+    endIntimateGame();
+    return;
+  }
+  
+  const actions = intimateActionType === 'virtual' ? intimateActionsVirtual : intimateActionsPhysical;
+  const randomAction = actions[Math.floor(Math.random() * actions.length)];
+  
+  document.getElementById('intimateActionText').textContent = randomAction;
+  document.getElementById('actionCounter').textContent = currentActionIndex + 1;
+}
+
+function nextIntimateAction() {
+  currentActionIndex++;
+  
+  if (currentActionIndex < 10) {
+    showIntimateAction();
+  } else {
+    document.getElementById('intimateActionText').textContent = "🔥 Félicitations ! Vous avez terminé le jeu ! Profitez bien... 😏💕";
+    document.getElementById('actionCounter').textContent = "10/10 ✓";
+    
+    if (currentSessionId) {
+      updateIntimateActionsStatus(currentSessionId, true);
+    }
+    
+    setTimeout(endIntimateGame, 4000);
+  }
+}
+
+function endIntimateGame() {
+  document.getElementById('intimateGameScreen').classList.add('hidden');
+  document.getElementById('resultsScreen').classList.remove('hidden');
+}
+
+function restartWithLevelChoice() {
+  answers1 = {};
+  answers2 = {};
+  questions = [];
+  currentActionIndex = 0;
+  hasPlayedIntimateActions = false;
+  currentSessionId = null;
+  
+  document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+  document.getElementById('modeChoiceScreen').classList.remove('hidden');
+  document.getElementById('partner1Name').value = '';
+  document.getElementById('partner2Name').value = '';
+  document.getElementById('distancePartner1Name').value = '';
+  document.getElementById('distancePartner2Name').value = '';
+  
+  showHistory();
+  
+  // Nettoyer l'URL
+  window.history.replaceState({}, document.title, window.location.pathname);
+}
+
+function restart() {
+  answers1 = {};
+  answers2 = {};
+  currentActionIndex = 0;
+  hasPlayedIntimateActions = false;
+  
+  document.getElementById('resultsScreen').classList.add('hidden');
+  
+  if (selectedMode === 'ensemble') {
+    document.getElementById('welcomeScreen').classList.remove('hidden');
+    document.getElementById('partner1Name').value = partner1;
+    document.getElementById('partner2Name').value = partner2;
+  } else {
+    document.getElementById('distanceWelcomeScreen').classList.remove('hidden');
+    document.getElementById('distancePartner1Name').value = partner1;
+    document.getElementById('distancePartner2Name').value = partner2;
+  }
+}
+
+// ============================================================================
+// FIN DU JAVASCRIPT
+// ============================================================================
+</script>
+
+</body>
+</html>
+
+<!-- ============================================================================ -->
+<!-- MODULE 8 : FERMETURE HTML                                                -->
+<!-- ============================================================================ -->
+<!-- C'EST TOUT ! Le fichier est complet. -->
+  
