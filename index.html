@@ -1,0 +1,301 @@
+<!-- ============================================================================ -->
+<!-- MODULE 1 : HTML HEADER + CSS                                             -->
+<!-- ============================================================================ -->
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jeu d'Actions Intimes 🔥</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --violet: #8b5cf6;
+      --rose: #ff6b9d;
+      --peche: #ff8fab;
+      --dark: #1a0033;
+      --darker: #0f001a;
+    }
+    
+    * { margin:0; padding:0; box-sizing:border-box; }
+    
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, var(--dark), var(--darker));
+      color: white;
+      min-height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .card {
+      max-width: 720px;
+      margin: 30px auto;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+    }
+    
+    h1, h2 { font-family: 'Playfair Display', serif; margin-bottom: 24px; }
+    .hidden { display: none !important; }
+    
+    input[type="text"], input[type="url"] {
+      width: 100%;
+      padding: 14px 18px;
+      margin: 12px 0;
+      border: 2px solid var(--peche);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      color: white;
+      font-size: 1.05em;
+    }
+    
+    input::placeholder { color: rgba(255,255,255,0.5); }
+    
+    input:focus {
+      outline: none;
+      border-color: var(--rose);
+      box-shadow: 0 0 0 3px rgba(255,107,157,0.2);
+    }
+    
+    button {
+      padding: 14px 28px;
+      font-size: 1.1em;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      margin: 12px;
+      transition: all 0.3s;
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .btn-primary { background: linear-gradient(45deg, var(--rose), var(--peche)); color: white; }
+    .btn-secondary { background: rgba(255,255,255,0.15); color: white; }
+    button:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(255,107,157,0.4); }
+    
+    /* BOUTONS DE CHOIX DE MODE */
+    .mode-btn {
+      background: rgba(255,255,255,0.08);
+      color: white;
+      display: block;
+      width: 100%;
+      max-width: 450px;
+      margin: 20px auto;
+      padding: 30px;
+      text-align: left;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .mode-btn:hover {
+      background: rgba(255,107,157,0.2);
+      border-color: var(--rose);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(255,107,157,0.3);
+    }
+    
+    .mode-btn .icon { 
+      font-size: 3em; 
+      margin-bottom: 15px; 
+      display: block;
+    }
+    
+    .mode-btn .title { 
+      font-size: 1.4em; 
+      font-weight: 700; 
+      margin-bottom: 10px; 
+      color: var(--peche);
+    }
+    
+    .mode-btn .desc { 
+      font-size: 1em; 
+      opacity: 0.85; 
+      line-height: 1.5; 
+    }
+    
+    .choice-btn {
+      background: rgba(255,255,255,0.12);
+      color: white;
+      display: inline-block;
+      min-width: 200px;
+    }
+    
+    .choice-btn.active, .choice-btn:hover:not(:disabled) {
+      background: linear-gradient(45deg, var(--rose), var(--peche));
+    }
+    
+    .progress-bar {
+      height: 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 5px;
+      margin: 24px 0;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--rose), var(--peche));
+      transition: width 0.5s ease;
+    }
+    
+    .question-card {
+      background: rgba(255,255,255,0.08);
+      padding: 20px;
+      margin: 16px 0;
+      border-radius: 16px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.7s forwards;
+      text-align: left;
+    }
+    
+    @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+    
+    #intimateActionText { font-size: 2em; line-height: 1.4; font-weight: 600; }
+    
+    footer { margin-top: 60px; color: rgba(255,255,255,0.6); font-size: 0.95em; }
+    footer a { color: var(--peche); margin: 0 10px; text-decoration: none; }
+    footer a:hover { color: var(--rose); }
+    
+    #heartsContainer { position: fixed; inset: 0; pointer-events: none; z-index: -1; overflow: hidden; }
+    .heart-float { position: absolute; animation: floatHeart linear forwards; }
+    @keyframes floatHeart { to { transform: translateY(-120vh) rotate(720deg); opacity: 0; } }
+    
+    .comparison-item { margin: 32px 0; }
+    .comparison-question { font-weight: 600; margin-bottom: 12px; color: var(--peche); font-size: 1.1em; }
+    .comparison-answers { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+    
+    .answer-box {
+      flex: 1;
+      min-width: 240px;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .answer-label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--peche);
+    }
+    
+    .answer-correct { border: 2px solid #22c55e; background: rgba(34,197,94,0.15); }
+    .answer-incorrect { border: 2px solid #ef4444; background: rgba(239,68,68,0.15); }
+    
+    #scoreHistory { margin: 40px 0; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 16px; }
+    .score-entry { margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; }
+    
+    .warning-adult {
+      background: rgba(255,107,157,0.2);
+      border: 2px solid var(--rose);
+      padding: 16px;
+      border-radius: 12px;
+      margin: 20px 0;
+      font-weight: 500;
+    }
+    
+    /* STYLES MODE DISTANCE */
+    .share-link-box {
+      background: rgba(139, 92, 246, 0.15);
+      padding: 25px;
+      border-radius: 15px;
+      margin: 30px 0;
+      border: 2px solid var(--violet);
+    }
+    
+    .share-link {
+      background: rgba(255,255,255,0.15);
+      padding: 15px;
+      border-radius: 10px;
+      word-break: break-all;
+      font-family: monospace;
+      font-size: 0.95em;
+      margin: 15px 0;
+      user-select: all;
+      border: 1px dashed rgba(255,255,255,0.3);
+    }
+    
+    .copy-btn {
+      background: var(--violet);
+      padding: 12px 30px;
+      border-radius: 10px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      font-size: 1em;
+    }
+    
+    .copy-btn:hover {
+      background: #7c3aed;
+      transform: scale(1.05);
+    }
+    
+    .waiting-screen {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    
+    .waiting-screen .spinner {
+      width: 80px;
+      height: 80px;
+      border: 6px solid rgba(255,255,255,0.1);
+      border-top-color: var(--rose);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 30px auto;
+    }
+    
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .mode-badge {
+      display: inline-block;
+      padding: 6px 15px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+    
+    .mode-badge.ensemble {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+      border: 1px solid #22c55e;
+    }
+    
+    .mode-badge.distance {
+      background: rgba(139, 92, 246, 0.2);
+      color: var(--violet);
+      border: 1px solid var(--violet);
+    }
+    
+    @media (max-width: 600px) {
+      .card { padding: 20px; }
+      h1 { font-size: 1.8em; }
+      .choice-btn { min-width: 160px; font-size: 0.95em; }
+      .answer-box { min-width: 100%; }
+      .mode-btn { padding: 20px; max-width: 100%; }
+      .mode-btn .icon { font-size: 2.5em; }
+      .mode-btn .title { font-size: 1.2em; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="heartsContainer"></div>
