@@ -299,3 +299,201 @@
 <body>
 
 <div id="heartsContainer"></div>
+  <!-- ============================================================================ -->
+<!-- MODULE 2 : HTML BODY (TOUS LES ÉCRANS)                                   -->
+<!-- ============================================================================ -->
+
+<!-- ÉCRAN 0 : Choix du Mode (NOUVEAU) -->
+<div id="modeChoiceScreen" class="card">
+  <h1>Jeu d'Actions Intimes 🔥</h1>
+  <div class="warning-adult">⚠️ Réservé aux adultes (+18 ans) ⚠️</div>
+  <h2 style="margin-top: 30px;">Comment voulez-vous jouer ?</h2>
+  
+  <button class="mode-btn" onclick="selectMode('ensemble')">
+    <span class="icon">👫</span>
+    <div class="title">Mode Ensemble</div>
+    <div class="desc">Vous êtes physiquement ensemble. Passez-vous le téléphone pour répondre chacun votre tour.</div>
+  </button>
+  
+  <button class="mode-btn" onclick="selectMode('distance')">
+    <span class="icon">📱</span>
+    <div class="title">Mode À Distance</div>
+    <div class="desc">Vous êtes séparés. Chacun joue de son côté, puis vous découvrez vos résultats ensemble !</div>
+  </button>
+</div>
+
+<!-- ÉCRAN 1 : Choix du niveau de questions -->
+<div id="questionCountScreen" class="card hidden">
+  <h1>Jeu d'Actions Intimes 🔥 <span id="modeBadge"></span></h1>
+  <p style="margin:20px 0; opacity:0.9;">Testez votre complicité de couple</p>
+  <h2>Choisis le niveau de profondeur</h2>
+
+  <button class="choice-btn" onclick="selectQuestionCount(20)">Débutant<br><small>20 questions</small></button>
+  <button class="choice-btn" onclick="selectQuestionCount(50)">Intermédiaire<br><small>50 questions</small></button>
+  <button class="choice-btn" onclick="selectQuestionCount(100)">Avancé<br><small>100 questions</small></button>
+  <button class="choice-btn" onclick="selectQuestionCount(200)">Extrême<br><small>Toutes les 200</small></button>
+
+  <div id="scoreHistory">
+    <h3 style="margin-bottom:16px; color:#ff8fab;">📊 Historique récent</h3>
+    <div id="historyList"></div>
+  </div>
+  
+  <button class="btn btn-secondary" onclick="backToModeChoice()">← Changer de mode</button>
+</div>
+
+<!-- ÉCRAN 2 : Noms (Mode Ensemble) -->
+<div id="welcomeScreen" class="card hidden">
+  <h1>Prêts à tester votre complicité ? 💕</h1>
+  <p style="margin:20px 0; opacity:0.8;">Entrez vos prénoms pour commencer</p>
+  <input type="text" id="partner1Name" placeholder="Prénom partenaire 1" autocomplete="off" maxlength="30">
+  <input type="text" id="partner2Name" placeholder="Prénom partenaire 2" autocomplete="off" maxlength="30">
+  <button class="btn btn-primary" onclick="startQuiz()">Commencer le quiz 🔥</button>
+  <button class="btn btn-secondary" onclick="backToLevelChoice()">← Retour</button>
+</div>
+
+<!-- ÉCRAN 2B : Noms (Mode Distance - Partenaire 1) -->
+<div id="distanceWelcomeScreen" class="card hidden">
+  <h1>Mode À Distance 📱</h1>
+  <p style="margin:20px 0; opacity:0.8;">Entrez vos prénoms</p>
+  <input type="text" id="distancePartner1Name" placeholder="Ton prénom" autocomplete="off" maxlength="30">
+  <input type="text" id="distancePartner2Name" placeholder="Prénom de ton partenaire" autocomplete="off" maxlength="30">
+  <p style="margin:20px 0; font-size:0.9em; opacity:0.7;">
+    💡 Tu vas répondre aux questions, puis tu enverras un lien à ton partenaire pour qu'il/elle réponde aussi.
+  </p>
+  <button class="btn btn-primary" onclick="startDistanceQuiz()">Commencer 🔥</button>
+  <button class="btn btn-secondary" onclick="backToLevelChoice()">← Retour</button>
+</div>
+
+<!-- ÉCRAN 2C : Rejoindre une session (Mode Distance - Partenaire 2) -->
+<div id="joinSessionScreen" class="card hidden">
+  <h1>Rejoindre une session 💕</h1>
+  <div id="sessionInfo" style="margin: 30px 0;"></div>
+  <button class="btn btn-primary" id="joinSessionBtn" onclick="joinSession()">Répondre aux questions 🔥</button>
+  <button class="btn btn-secondary" onclick="location.reload()">Annuler</button>
+</div>
+
+<!-- ÉCRAN 3 : Quiz 1 (Mode Ensemble) -->
+<div id="quiz1Screen" class="card hidden">
+  <h2 id="quiz1Title"></h2>
+  <div class="progress-bar"><div id="progress1" class="progress-fill"></div></div>
+  <p style="opacity:0.7; margin-bottom:20px;" id="progress1Text">0% complété</p>
+  <div id="questions1Container"></div>
+  <button class="btn btn-primary" id="submit1Btn" onclick="submitQuiz1()" disabled>Valider mes réponses →</button>
+  <button class="btn btn-secondary" onclick="confirmQuit()">Abandonner</button>
+</div>
+
+<!-- ÉCRAN 3B : Quiz Distance (Partenaire 1 ou 2) -->
+<div id="distanceQuizScreen" class="card hidden">
+  <h2 id="distanceQuizTitle"></h2>
+  <div class="progress-bar"><div id="distanceProgress" class="progress-fill"></div></div>
+  <p style="opacity:0.7; margin-bottom:20px;" id="distanceProgressText">0% complété</p>
+  <div id="distanceQuestionsContainer"></div>
+  <button class="btn btn-primary" id="submitDistanceBtn" onclick="submitDistanceQuiz()" disabled>Valider mes réponses →</button>
+  <button class="btn btn-secondary" onclick="confirmQuit()">Abandonner</button>
+</div>
+
+<!-- ÉCRAN 4 : Lien de partage (Mode Distance - Après réponses Partenaire 1) -->
+<div id="shareLinkScreen" class="card hidden">
+  <h1>Parfait ! 🎉</h1>
+  <p style="font-size:1.2em; margin:20px 0;">Tu as terminé ! Maintenant, envoie ce lien à <strong id="partnerNameToShare"></strong> :</p>
+  
+  <div class="share-link-box">
+    <h3 style="margin-bottom:15px; color:var(--violet);">🔗 Lien à partager</h3>
+    <div class="share-link" id="shareLink"></div>
+    <button class="copy-btn" onclick="copyShareLink()">📋 Copier le lien</button>
+  </div>
+  
+  <p style="margin:30px 0; opacity:0.8;">
+    💡 Tu peux partager ce lien par WhatsApp, SMS, email, etc.<br>
+    Les résultats s'afficheront quand ton partenaire aura terminé !
+  </p>
+  
+  <div id="waitingForPartner" class="waiting-screen hidden">
+    <h3>⏳ En attente de <span id="waitingPartnerName"></span>...</h3>
+    <div class="spinner"></div>
+    <p style="opacity:0.7;">Cette page se mettra à jour automatiquement quand ton partenaire aura fini.</p>
+    <button class="btn btn-secondary" onclick="checkSessionStatus()" style="margin-top:20px;">🔄 Vérifier maintenant</button>
+  </div>
+</div>
+
+<!-- ÉCRAN 5 : Transition (Mode Ensemble seulement) -->
+<div id="transitionScreen" class="card hidden">
+  <h2 id="transitionMessage"></h2>
+  <p style="margin:20px 0; opacity:0.8;">Passe le téléphone à ton partenaire 📱</p>
+  <button class="btn btn-primary" onclick="startQuiz2()">C'est parti ! 💖</button>
+</div>
+
+<!-- ÉCRAN 6 : Quiz 2 (Mode Ensemble seulement) -->
+<div id="quiz2Screen" class="card hidden">
+  <h2 id="quiz2Title"></h2>
+  <div class="progress-bar"><div id="progress2" class="progress-fill"></div></div>
+  <p style="opacity:0.7; margin-bottom:20px;" id="progress2Text">0% complété</p>
+  <div id="questions2Container"></div>
+  <button class="btn btn-primary" id="submit2Btn" onclick="submitQuiz2()" disabled>Voir nos résultats 💞</button>
+  <button class="btn btn-secondary" onclick="confirmQuit()">Abandonner</button>
+</div>
+
+<!-- ÉCRAN 7 : Résultats -->
+<div id="resultsScreen" class="card hidden">
+  <h1>Votre score de complicité</h1>
+  <div style="font-size:6em; font-weight:700; color:var(--peche); margin:30px 0;" id="scoreDisplay">0%</div>
+  <p id="resultMessage" style="font-size:1.5em; margin:20px 0;"></p>
+  <div id="scoreBreakdown" style="margin:30px 0; padding:20px; background:rgba(255,255,255,0.05); border-radius:12px;"></div>
+
+  <div id="bonusGameOffer" class="hidden" style="margin:50px 0;">
+    <h2>😏 Mode Intime Accessible ! 😏</h2>
+    <p style="margin:15px 0;">Votre complicité est suffisante pour tenter les 10 actions intimes… Prêts ?</p>
+    <div id="intimateTypeChoice"></div>
+  </div>
+
+  <div id="comparisonContainer"></div>
+
+  <button class="btn btn-primary" onclick="restartWithLevelChoice()" style="margin:30px 0;">
+    Recommencer avec un autre niveau
+  </button>
+  <button class="btn btn-secondary" onclick="restart()">Rejouer (même niveau)</button>
+</div>
+
+<!-- ÉCRAN 8 : Jeu intime -->
+<div id="intimateGameScreen" class="card hidden">
+  <h1>Jeu d'Actions Intimes 🔥</h1>
+  <div class="warning-adult">Réservé aux adultes (+18 ans)</div>
+  <p id="intimateTypeLabel" style="margin:20px 0; font-size:1.1em; color:var(--peche);"></p>
+
+  <div style="margin:40px 0;">
+    <div style="background: linear-gradient(135deg, rgba(40,20,60,0.8), rgba(139,92,246,0.6)); padding:50px 30px; border-radius:24px; border:3px solid var(--rose); min-height:300px; display:flex; align-items:center; justify-content:center; box-shadow:0 20px 60px rgba(255,107,157,0.3);">
+      <p id="intimateActionText" style="font-size:2.1em; line-height:1.45; font-weight:600;"></p>
+    </div>
+    <p style="margin-top:30px; font-size:1.3em; color:#ffb3d9;">
+      Action <span id="actionCounter">1</span> / 10
+    </p>
+  </div>
+
+  <button class="btn btn-primary" onclick="nextIntimateAction()">Action suivante 🔥</button>
+  <button class="btn btn-secondary" onclick="endIntimateGame()" style="margin-top:20px;">Terminer le jeu</button>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div style="margin:20px 0;">✨ Créé avec 💕 par Miracle LOHOUNME ✨</div>
+  <div>
+    <a href="https://wa.me/22990821282" target="_blank" rel="noopener noreferrer">WhatsApp</a> •
+    <a href="https://www.facebook.com/Miracle.lohw" target="_blank" rel="noopener noreferrer">Facebook</a> •
+    <a href="https://miracle-do.github.io/mon-site/" target="_blank" rel="noopener noreferrer">Portfolio</a>
+  </div>
+</footer>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- Configuration Firebase -->
+<script src="firebase-config-v2.js"></script>
+
+<script>
+// Initialiser Firebase au chargement
+window.addEventListener('load', () => {
+  initializeFirebase();
+  detectSessionFromURL();
+});
+  
