@@ -496,4 +496,847 @@ window.addEventListener('load', () => {
   initializeFirebase();
   detectSessionFromURL();
 });
+  // ============================================================================
+// MODULE 3 : DONNÉES (QUESTIONS + ACTIONS INTIMES)
+// ============================================================================
+
+// COLLEZ TOUTES LES 200 QUESTIONS ICI (celles du fichier original)
+// Pour gagner de la place, je mets juste les premières et dernières
+
+const allQuestions = [
+  // 1-30 léger (intensité 1)
+  {id:1,text:"Quelle est ta couleur préférée ?",about:"self",intensity:1},
+  {id:2,text:"Quelle est la couleur préférée de ton partenaire ?",about:"partner",intensity:1},
+  {id:3,text:"Quel est ton plat préféré ?",about:"self",intensity:1},
+  {id:4,text:"Quel est le plat préféré de ton partenaire ?",about:"partner",intensity:1},
+  {id:5,text:"Où s'est déroulé votre premier rendez-vous ?",about:"both",intensity:1},
+  {id:6,text:"Quelle est ta plus grande peur ?",about:"self",intensity:1},
+  {id:7,text:"Quelle est la plus grande peur de ton partenaire ?",about:"partner",intensity:1},
+  {id:8,text:"Si tu pouvais avoir un super-pouvoir, ce serait lequel ?",about:"self",intensity:1},
+  {id:9,text:"Quel super-pouvoir ton partenaire choisirait-il/elle ?",about:"partner",intensity:1},
+  {id:10,text:"Quelle est ta destination de vacances de rêve ?",about:"self",intensity:1},
+  {id:11,text:"Quelle est la destination de vacances de rêve de ton partenaire ?",about:"partner",intensity:1},
+  {id:12,text:"Quel est ton film/série préféré(e) ?",about:"self",intensity:1},
+  {id:13,text:"Quel est le film/série préféré(e) de ton partenaire ?",about:"partner",intensity:1},
+  {id:14,text:"Si vous deviez adopter un animal ensemble, ce serait quoi ?",about:"both",intensity:1},
+  {id:15,text:"Quelle est ta chanson préférée en ce moment ?",about:"self",intensity:1},
+  {id:16,text:"Quelle chanson ton partenaire écoute-t-il/elle en boucle ?",about:"partner",intensity:1},
+  {id:17,text:"Quel est ton hobby favori ?",about:"self",intensity:1},
+  {id:18,text:"Quel est le hobby préféré de ton partenaire ?",about:"partner",intensity:1},
+  {id:19,text:"Quelle est ta saison préférée ?",about:"self",intensity:1},
+  {id:20,text:"Quelle saison ton partenaire préfère-t-il/elle ?",about:"partner",intensity:1},
+  {id:21,text:"Quel est ton dessert favori ?",about:"self",intensity:1},
+  {id:22,text:"Quel dessert ton partenaire adore-t-il/elle ?",about:"partner",intensity:1},
+  {id:23,text:"Quelle est ta matière scolaire préférée (ou était) ?",about:"self",intensity:1},
+  {id:24,text:"Quelle matière ton partenaire aimait à l'école ?",about:"partner",intensity:1},
+  {id:25,text:"Quel sport préfères-tu regarder ?",about:"self",intensity:1},
+  {id:26,text:"Quel sport ton partenaire aime regarder ?",about:"partner",intensity:1},
+  {id:27,text:"Quelle est ta boisson préférée ?",about:"self",intensity:1},
+  {id:28,text:"Quelle boisson ton partenaire commande souvent ?",about:"partner",intensity:1},
+  {id:29,text:"Dans quelle ville aimerais-tu vivre ?",about:"self",intensity:1},
+  {id:30,text:"Dans quelle ville ton partenaire aimerait vivre ?",about:"partner",intensity:1},
+
+  // 31-80 moyen (intensité 2)
+  {id:31,text:"Quel est ton plus beau souvenir ensemble ?",about:"both",intensity:2},
+  {id:32,text:"Qu'est-ce qui t'a attiré la première fois chez ton partenaire ?",about:"self",intensity:2},
+  {id:33,text:"Qu'est-ce qui a attiré ton partenaire chez toi la première fois ?",about:"partner",intensity:2},
+  {id:34,text:"Quelle est ta plus grande qualité selon toi ?",about:"self",intensity:2},
+  {id:35,text:"Quelle est la plus grande qualité de ton partenaire ?",about:"partner",intensity:2},
+  {id:36,text:"Quel est ton plus grand défaut ?",about:"self",intensity:2},
+  {id:37,text:"Quel est le plus grand défaut de ton partenaire ?",about:"partner",intensity:2},
+  {id:38,text:"Quelle est ta plus grande fierté dans la vie ?",about:"self",intensity:2},
+  {id:39,text:"De quoi ton partenaire est-il/elle le plus fier/fière ?",about:"partner",intensity:2},
+  {id:40,text:"Quel est ton rêve le plus fou ?",about:"self",intensity:2},
+  {id:41,text:"Quel est le rêve le plus fou de ton partenaire ?",about:"partner",intensity:2},
+  {id:42,text:"Quelle est ta plus grande réussite ?",about:"self",intensity:2},
+  {id:43,text:"Quelle est la plus grande réussite de ton partenaire ?",about:"partner",intensity:2},
+  {id:44,text:"Quel est ton souvenir d'enfance préféré ?",about:"self",intensity:2},
+  {id:45,text:"Quel est le souvenir d'enfance préféré de ton partenaire ?",about:"partner",intensity:2},
+  {id:46,text:"Quelle est la chose que tu admires le plus chez ton partenaire ?",about:"self",intensity:2},
+  {id:47,text:"Quelle chose ton partenaire admire-t-il/elle le plus chez toi ?",about:"partner",intensity:2},
+  {id:48,text:"Quel est ton plus grand regret ?",about:"self",intensity:2},
+  {id:49,text:"Quel est le plus grand regret de ton partenaire ?",about:"partner",intensity:2},
+  {id:50,text:"Quelle est ta plus grande phobie ?",about:"self",intensity:2},
+  {id:51,text:"Quelle est la phobie de ton partenaire ?",about:"partner",intensity:2},
+  {id:52,text:"Quel est ton moment préféré de la journée ?",about:"self",intensity:2},
+  {id:53,text:"Quel moment de la journée ton partenaire préfère-t-il/elle ?",about:"partner",intensity:2},
+  {id:54,text:"Quelle est ta citation ou phrase préférée ?",about:"self",intensity:2},
+  {id:55,text:"Quelle citation ton partenaire aime-t-il/elle ?",about:"partner",intensity:2},
+  {id:56,text:"Quel est ton parfum ou odeur préféré(e) ?",about:"self",intensity:2},
+  {id:57,text:"Quel parfum ou odeur ton partenaire préfère-t-il/elle ?",about:"partner",intensity:2},
+  {id:58,text:"Quelle est ta plus grande ambition ?",about:"self",intensity:2},
+  {id:59,text:"Quelle est la plus grande ambition de ton partenaire ?",about:"partner",intensity:2},
+  {id:60,text:"Si tu pouvais rencontrer quelqu'un (vivant ou mort), qui ce serait ?",about:"self",intensity:2},
+  {id:61,text:"Qui ton partenaire aimerait-il/elle rencontrer ?",about:"partner",intensity:2},
+  {id:62,text:"Quel est ton talent caché ?",about:"self",intensity:2},
+  {id:63,text:"Quel est le talent caché de ton partenaire ?",about:"partner",intensity:2},
+  {id:64,text:"Quelle est ta plus grande insécurité ?",about:"self",intensity:2},
+  {id:65,text:"Quelle est la plus grande insécurité de ton partenaire ?",about:"partner",intensity:2},
+  {id:66,text:"Quel est ton style vestimentaire préféré ?",about:"self",intensity:2},
+  {id:67,text:"Quel style vestimentaire ton partenaire préfère-t-il/elle ?",about:"partner",intensity:2},
+  {id:68,text:"Quelle est ta façon préférée de te détendre ?",about:"self",intensity:2},
+  {id:69,text:"Comment ton partenaire préfère-t-il/elle se détendre ?",about:"partner",intensity:2},
+  {id:70,text:"Quel est ton type de musique préféré ?",about:"self",intensity:2},
+  {id:71,text:"Quel type de musique ton partenaire préfère-t-il/elle ?",about:"partner",intensity:2},
+  {id:72,text:"Quelle est ta période historique préférée ?",about:"self",intensity:2},
+  {id:73,text:"Quelle période historique fascine ton partenaire ?",about:"partner",intensity:2},
+  {id:74,text:"Quel est ton plat réconfort absolu ?",about:"self",intensity:2},
+  {id:75,text:"Quel est le plat réconfort de ton partenaire ?",about:"partner",intensity:2},
+  {id:76,text:"Quelle est ta routine matinale idéale ?",about:"self",intensity:2},
+  {id:77,text:"Quelle est la routine matinale idéale de ton partenaire ?",about:"partner",intensity:2},
+  {id:78,text:"Quel est ton moyen de transport préféré ?",about:"self",intensity:2},
+  {id:79,text:"Quel moyen de transport ton partenaire préfère-t-il/elle ?",about:"partner",intensity:2},
+  {id:80,text:"Quelle est votre tradition de couple préférée ?",about:"both",intensity:2},
+
+  // 81-150 avancé (intensité 2-3)
+  {id:81,text:"Quelle est ta plus grande faiblesse en amour ?",about:"self",intensity:2},
+  {id:82,text:"Quelle est la plus grande faiblesse de ton partenaire en amour ?",about:"partner",intensity:2},
+  {id:83,text:"Quel est ton langage d'amour principal ?",about:"self",intensity:2},
+  {id:84,text:"Quel est le langage d'amour principal de ton partenaire ?",about:"partner",intensity:2},
+  {id:85,text:"Quelle est ta vision de la relation idéale ?",about:"self",intensity:2},
+  {id:86,text:"Quelle est la vision de ton partenaire d'une relation idéale ?",about:"partner",intensity:2},
+  {id:87,text:"Combien d'enfants souhaites-tu avoir (ou en as-tu) ?",about:"self",intensity:2},
+  {id:88,text:"Combien d'enfants ton partenaire souhaite-t-il/elle avoir ?",about:"partner",intensity:2},
+  {id:89,text:"Quelle est ta plus grande valeur dans la vie ?",about:"self",intensity:2},
+  {id:90,text:"Quelle est la plus grande valeur de ton partenaire ?",about:"partner",intensity:2},
+  {id:91,text:"Quel est ton plus grand turn-on (ce qui t'attire) ?",about:"self",intensity:3},
+  {id:92,text:"Quel est le plus grand turn-on de ton partenaire ?",about:"partner",intensity:3},
+  {id:93,text:"Quel est ton plus grand turn-off (ce qui te repousse) ?",about:"self",intensity:3},
+  {id:94,text:"Quel est le plus grand turn-off de ton partenaire ?",about:"partner",intensity:3},
+  {id:95,text:"Quelle partie du corps de ton partenaire préfères-tu ?",about:"self",intensity:3},
+  {id:96,text:"Quelle partie de ton corps ton partenaire préfère-t-il/elle ?",about:"partner",intensity:3},
+  {id:97,text:"Quelle est ta position sexuelle préférée ?",about:"self",intensity:3},
+  {id:98,text:"Quelle est la position sexuelle préférée de ton partenaire ?",about:"partner",intensity:3},
+  {id:99,text:"Quel est ton fantasme le plus secret ?",about:"self",intensity:3},
+  {id:100,text:"Quel est le fantasme le plus secret de ton partenaire ?",about:"partner",intensity:3},
+  {id:101,text:"Quelle est ta zone érogène préférée ?",about:"self",intensity:3},
+  {id:102,text:"Quelle est la zone érogène préférée de ton partenaire ?",about:"partner",intensity:3},
+  {id:103,text:"Quel moment de la journée préfères-tu pour l'intimité ?",about:"self",intensity:3},
+  {id:104,text:"Quel moment ton partenaire préfère-t-il/elle pour l'intimité ?",about:"partner",intensity:3},
+  {id:105,text:"Quelle est l'endroit le plus fou où vous avez fait l'amour ?",about:"both",intensity:3},
+  {id:106,text:"Quel type de préliminaires préfères-tu ?",about:"self",intensity:3},
+  {id:107,text:"Quel type de préliminaires ton partenaire préfère-t-il/elle ?",about:"partner",intensity:3},
+  {id:108,text:"Quelle lingerie ton partenaire trouve-t-il/elle la plus sexy ?",about:"partner",intensity:3},
+  {id:109,text:"Quel type de lingerie trouves-tu la plus sexy ?",about:"self",intensity:3},
+  {id:110,text:"Quelle est ta fréquence idéale pour l'intimité ?",about:"self",intensity:3},
+  {id:111,text:"Quelle est la fréquence idéale de ton partenaire pour l'intimité ?",about:"partner",intensity:3},
+  {id:112,text:"Aimes-tu les jeux de rôle ? Si oui, lesquels ?",about:"self",intensity:3},
+  {id:113,text:"Ton partenaire aime-t-il/elle les jeux de rôle ? Lesquels ?",about:"partner",intensity:3},
+  {id:114,text:"Quelle est ta limite absolue en intimité (ce que tu ne ferais jamais) ?",about:"self",intensity:3},
+  {id:115,text:"Quelle est la limite absolue de ton partenaire en intimité ?",about:"partner",intensity:3},
+  {id:116,text:"Préfères-tu être dominant(e) ou soumis(e) ?",about:"self",intensity:3},
+  {id:117,text:"Ton partenaire préfère-t-il/elle être dominant(e) ou soumis(e) ?",about:"partner",intensity:3},
+  {id:118,text:"Quelle est ta phrase ou mot préféré(e) à entendre au lit ?",about:"self",intensity:3},
+  {id:119,text:"Quelle phrase ou mot ton partenaire aime-t-il/elle entendre au lit ?",about:"partner",intensity:3},
+  {id:120,text:"Quelle est ton ambiance idéale pour l'intimité (musique, bougies, etc.) ?",about:"self",intensity:3},
+  {id:121,text:"Quelle ambiance ton partenaire préfère-t-il/elle pour l'intimité ?",about:"partner",intensity:3},
+  {id:122,text:"As-tu déjà utilisé des jouets intimes ? Lesquels ?",about:"self",intensity:3},
+  {id:123,text:"Ton partenaire a-t-il/elle déjà utilisé des jouets intimes ? Lesquels ?",about:"partner",intensity:3},
+  {id:124,text:"Quelle est ta durée idéale pour un rapport intime ?",about:"self",intensity:3},
+  {id:125,text:"Quelle est la durée idéale de ton partenaire pour un rapport ?",about:"partner",intensity:3},
+  {id:126,text:"Préfères-tu le sexe doux et romantique ou plus intense ?",about:"self",intensity:3},
+  {id:127,text:"Ton partenaire préfère-t-il/elle le sexe doux ou intense ?",about:"partner",intensity:3},
+  {id:128,text:"Quel film ou série érotique vous a le plus excité(e)s ?",about:"both",intensity:3},
+  {id:129,text:"Quelle partie du corps aimes-tu qu'on embrasse en premier ?",about:"self",intensity:3},
+  {id:130,text:"Quelle partie du corps ton partenaire aime-t-il/elle qu'on embrasse d'abord ?",about:"partner",intensity:3},
+  {id:131,text:"Quelle est ta technique de séduction préférée ?",about:"self",intensity:2},
+  {id:132,text:"Quelle est la technique de séduction préférée de ton partenaire ?",about:"partner",intensity:2},
+  {id:133,text:"Quel compliment aimes-tu le plus recevoir ?",about:"self",intensity:2},
+  {id:134,text:"Quel compliment ton partenaire aime-t-il/elle le plus recevoir ?",about:"partner",intensity:2},
+  {id:135,text:"Quelle surprise romantique t'a le plus marqué(e) ?",about:"self",intensity:2},
+  {id:136,text:"Quelle surprise romantique a le plus marqué ton partenaire ?",about:"partner",intensity:2},
+  {id:137,text:"Quelle est ta date parfaite ?",about:"self",intensity:2},
+  {id:138,text:"Quelle est la date parfaite selon ton partenaire ?",about:"partner",intensity:2},
+  {id:139,text:"Quel cadeau t'a fait le plus plaisir de la part de ton partenaire ?",about:"self",intensity:2},
+  {id:140,text:"Quel cadeau a fait le plus plaisir à ton partenaire de ta part ?",about:"partner",intensity:2},
+  {id:141,text:"Quelle chanson représente le mieux votre relation ?",about:"both",intensity:2},
+  {id:142,text:"Quel surnom affectueux ton partenaire préfère-t-il/elle ?",about:"partner",intensity:2},
+  {id:143,text:"Quel surnom affectueux préfères-tu ?",about:"self",intensity:2},
+  {id:144,text:"Quelle est ta conception du romantisme ?",about:"self",intensity:2},
+  {id:145,text:"Quelle est la conception du romantisme de ton partenaire ?",about:"partner",intensity:2},
+  {id:146,text:"Quelle activité aimes-tu faire à deux ?",about:"self",intensity:2},
+  {id:147,text:"Quelle activité ton partenaire aime-t-il/elle faire à deux ?",about:"partner",intensity:2},
+  {id:148,text:"Quelle est ta façon préférée de dire 'je t'aime' ?",about:"self",intensity:2},
+  {id:149,text:"Quelle est la façon préférée de ton partenaire de dire 'je t'aime' ?",about:"partner",intensity:2},
+  {id:150,text:"Quel est votre endroit secret préféré ?",about:"both",intensity:2},
+// 151-200 extrême (intensité 3)
+  {id:151,text:"Quelle est ta plus grande insatisfaction dans votre vie intime ?",about:"self",intensity:3},
+  {id:152,text:"Quelle est la plus grande insatisfaction de ton partenaire dans votre vie intime ?",about:"partner",intensity:3},
+  {id:153,text:"As-tu déjà fantasmé sur quelqu'un d'autre ? Qui ?",about:"self",intensity:3},
+  {id:154,text:"Ton partenaire a-t-il/elle déjà fantasmé sur quelqu'un d'autre ?",about:"partner",intensity:3},
+  {id:155,text:"Quelle est la chose la plus osée que tu aimerais essayer ?",about:"self",intensity:3},
+  {id:156,text:"Quelle est la chose la plus osée que ton partenaire aimerait essayer ?",about:"partner",intensity:3},
+  {id:157,text:"Quelle partie de ton corps es-tu le plus complexé(e) ?",about:"self",intensity:3},
+  {id:158,text:"De quelle partie de son corps ton partenaire est-il/elle le plus complexé(e) ?",about:"partner",intensity:3},
+  {id:159,text:"As-tu déjà fait semblant de jouir ?",about:"self",intensity:3},
+  {id:160,text:"Ton partenaire a-t-il/elle déjà fait semblant de jouir ?",about:"partner",intensity:3},
+  {id:161,text:"Quelle est ta plus grande frustration sexuelle ?",about:"self",intensity:3},
+  {id:162,text:"Quelle est la plus grande frustration sexuelle de ton partenaire ?",about:"partner",intensity:3},
+  {id:163,text:"Aimerais-tu essayer quelque chose de nouveau au lit ? Quoi ?",about:"self",intensity:3},
+  {id:164,text:"Ton partenaire aimerait-il/elle essayer quelque chose de nouveau ? Quoi ?",about:"partner",intensity:3},
+  {id:165,text:"Quelle est ta plus grande crainte concernant votre relation ?",about:"self",intensity:3},
+  {id:166,text:"Quelle est la plus grande crainte de ton partenaire concernant votre relation ?",about:"partner",intensity:3},
+  {id:167,text:"Que changerais-tu dans votre vie de couple ?",about:"self",intensity:3},
+  {id:168,text:"Que ton partenaire changerait-il/elle dans votre vie de couple ?",about:"partner",intensity:3},
+  {id:169,text:"Quelle est ton expérience sexuelle la plus mémorable ?",about:"self",intensity:3},
+  {id:170,text:"Quelle est l'expérience sexuelle la plus mémorable de ton partenaire ?",about:"partner",intensity:3},
+  {id:171,text:"As-tu déjà eu une aventure d'un soir ? Combien ?",about:"self",intensity:3},
+  {id:172,text:"Ton partenaire a-t-il/elle déjà eu une aventure d'un soir ? Combien ?",about:"partner",intensity:3},
+  {id:173,text:"Quel est ton nombre de partenaires sexuels ?",about:"self",intensity:3},
+  {id:174,text:"Quel est le nombre de partenaires sexuels de ton partenaire ?",about:"partner",intensity:3},
+  {id:175,text:"Quelle est ta position sur la fidélité absolue ?",about:"self",intensity:3},
+  {id:176,text:"Quelle est la position de ton partenaire sur la fidélité absolue ?",about:"partner",intensity:3},
+  {id:177,text:"Serais-tu ouvert(e) à un plan à trois ?",about:"self",intensity:3},
+  {id:178,text:"Ton partenaire serait-il/elle ouvert(e) à un plan à trois ?",about:"partner",intensity:3},
+  {id:179,text:"Quelle est ta plus grande jalousie ?",about:"self",intensity:3},
+  {id:180,text:"Quelle est la plus grande jalousie de ton partenaire ?",about:"partner",intensity:3},
+  {id:181,text:"As-tu déjà trompé quelqu'un ?",about:"self",intensity:3},
+  {id:182,text:"Ton partenaire a-t-il/elle déjà trompé quelqu'un ?",about:"partner",intensity:3},
+  {id:183,text:"Quelle est la chose la plus gênante qui te soit arrivée au lit ?",about:"self",intensity:3},
+  {id:184,text:"Quelle est la chose la plus gênante arrivée à ton partenaire au lit ?",about:"partner",intensity:3},
+  {id:185,text:"Quelle partie de ton passé sexuel préférerais-tu cacher ?",about:"self",intensity:3},
+  {id:186,text:"Quelle partie de son passé sexuel ton partenaire préférerait cacher ?",about:"partner",intensity:3},
+  {id:187,text:"Quelle est ta plus grande honte sexuelle ?",about:"self",intensity:3},
+  {id:188,text:"Quelle est la plus grande honte sexuelle de ton partenaire ?",about:"partner",intensity:3},
+  {id:189,text:"As-tu déjà menti sur ton orgasme ?",about:"self",intensity:3},
+  {id:190,text:"Ton partenaire a-t-il/elle déjà menti sur son orgasme ?",about:"partner",intensity:3},
+  {id:191,text:"Quelle est la chose la plus kinky que tu aies faite ?",about:"self",intensity:3},
+  {id:192,text:"Quelle est la chose la plus kinky que ton partenaire ait faite ?",about:"partner",intensity:3},
+  {id:193,text:"Aimerais-tu être filmé(e) pendant l'acte ?",about:"self",intensity:3},
+  {id:194,text:"Ton partenaire aimerait-il/elle être filmé(e) pendant l'acte ?",about:"partner",intensity:3},
+  {id:195,text:"Quelle célébrité trouves-tu la plus sexy ?",about:"self",intensity:3},
+  {id:196,text:"Quelle célébrité ton partenaire trouve-t-il/elle la plus sexy ?",about:"partner",intensity:3},
+  {id:197,text:"Quelle est ta plus grande insécurité au lit ?",about:"self",intensity:3},
+  {id:198,text:"Quelle est la plus grande insécurité de ton partenaire au lit ?",about:"partner",intensity:3},
+  {id:199,text:"Quel est le moment le plus embarrassant de votre relation ?",about:"both",intensity:3},
+  {id:200,text:"Quelle est la chose la plus érotique que vous ayez faite ensemble ?",about:"both",intensity:3}
+];
+// ACTIONS INTIMES - MODE PHYSIQUE (pour mode ensemble OU retrouvailles)
+const intimateActionsPhysical = [
+  "Embrasse passionnément ton partenaire pendant 30 secondes sans t'arrêter",
+  "Fais un massage sensuel du dos de ton partenaire pendant 2 minutes",
+  "Chuchote à l'oreille de ton partenaire ce que tu aimerais lui faire ce soir",
+  "Caresse doucement le visage de ton partenaire en le/la regardant dans les yeux",
+  "Embrasse tendrement le cou de ton partenaire pendant 1 minute",
+  "Fais un strip-tease lent et sensuel pour ton partenaire",
+  "Masse les pieds de ton partenaire avec de l'huile",
+  "Mordille délicatement l'oreille de ton partenaire",
+  "Décris en détail ton fantasme préféré à ton partenaire",
+  "Fais un câlin enlacé pendant 3 minutes en silence, en ressentant la chaleur de l'autre",
+  "Caresse les cheveux de ton partenaire tout en l'embrassant",
+  "Dessine des motifs sur le dos de ton partenaire avec tes doigts",
+  "Embrasse chaque doigt de ton partenaire sensuellement",
+  "Fais un massage des épaules à ton partenaire",
+  "Murmure 3 choses que tu adores chez ton partenaire",
+  "Lèche délicatement les lèvres de ton partenaire",
+  "Caresse l'intérieur des cuisses de ton partenaire",
+  "Fais un bisou sur chaque partie du corps que ton partenaire désigne",
+  "Danse un slow collé-serré avec ton partenaire",
+  "Retire lentement un vêtement de ton partenaire",
+  "Souffle doucement dans le cou de ton partenaire",
+  "Fais courir tes doigts sur les bras de ton partenaire",
+  "Embrasse le ventre de ton partenaire tendrement",
+  "Caresse le visage de ton partenaire avec une plume (ou tes cheveux)",
+  "Partage un aliment en le nourrissant sensuellement à ton partenaire",
+  "Embrasse les mains de ton partenaire",
+  "Fais des cercles avec tes doigts sur la nuque de ton partenaire",
+  "Regarde intensément ton partenaire dans les yeux pendant 1 minute sans parler",
+  "Caresse doucement les hanches de ton partenaire",
+  "Fais gémir ton partenaire avec tes caresses les plus tendres"
+];
+
+// ACTIONS INTIMES - MODE VIRTUEL (pour mode distance)
+const intimateActionsVirtual = [
+  "Envoie une photo de toi dans ta tenue la plus sexy (à ton confort)",
+  "Fais un strip-tease devant la webcam",
+  "Décris en détail ton fantasme préféré par message vocal",
+  "Montre-toi en sous-vêtements en vidéo",
+  "Envoie un message vocal en gémissant sensuellement",
+  "Fais semblant de t'embrasser avec la caméra",
+  "Montre comment tu te touches (à ton confort)",
+  "Décris ce que tu aimerais faire à ton partenaire en ce moment",
+  "Envoie une photo suggestive (sans nudité complète)",
+  "Fais un appel vidéo et montre ton corps lentement",
+  "Murmure des mots coquins à la caméra",
+  "Fais comme si tu embrassais le cou de ton partenaire face caméra",
+  "Envoie une vidéo de toi en train de danser sensuellement",
+  "Montre ta chambre et décris ce que vous y feriez ensemble",
+  "Fais des bruits sensuels pour exciter ton partenaire",
+  "Envoie une photo de la partie de ton corps que tu préfères",
+  "Décris en détail comment serait votre prochaine nuit ensemble",
+  "Fais un show de 30 secondes pour exciter ton partenaire",
+  "Envoie un message texte très explicite sur tes désirs",
+  "Montre comment tu réagirais à ses caresses (mimé)",
+  "Fais semblant de mordiller ton partenaire face caméra",
+  "Envoie une vidéo de toi qui t'allonges sensuellement sur le lit",
+  "Décris ton rêve érotique le plus fou",
+  "Fais des mouvements suggestifs face à la caméra",
+  "Envoie une photo de toi mordu la lèvre de façon sexy",
+  "Montre comment tu te préparerais pour une nuit avec lui/elle",
+  "Décris en détail ta position préférée et pourquoi",
+  "Fais un compte à rebours sensuel avant de te révéler",
+  "Envoie une vidéo de toi chuchotant des choses coquines",
+  "Promets à ton partenaire ce que tu lui feras lors des retrouvailles"
+];
+
+// VARIABLES GLOBALES
+let selectedQuestionCount = 50;
+let selectedMode = ''; // 'ensemble' ou 'distance'
+let questions = [];
+let partner1 = "";
+let partner2 = "";
+let answers1 = {};
+let answers2 = {};
+let currentActionIndex = 0;
+let activeHearts = 0;
+const maxHearts = 20;
+let hasPlayedIntimateActions = false;
+let currentSessionId = null;
+let intimateActionType = 'physical'; // 'physical' ou 'virtual'
+// ============================================================================
+// MODULE 4 : FONCTIONS UTILITAIRES
+// ============================================================================
+
+// Échapper le HTML pour éviter les injections XSS
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Confirmer avant de quitter
+function confirmQuit() {
+  if (confirm("Es-tu sûr(e) de vouloir abandonner ? Toutes les réponses seront perdues.")) {
+    restartWithLevelChoice();
+  }
+}
+
+// Mélanger un tableau (algorithme Fisher-Yates)
+function shuffleArray(array) {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+// Cœurs flottants animés
+function createFloatingHearts() {
+  const container = document.getElementById('heartsContainer');
+  const hearts = ['💕','💖','💗','💓','💝','❤️','🥰','😍','💋','🌹'];
   
+  setInterval(() => {
+    if (activeHearts >= maxHearts) return;
+    
+    const heart = document.createElement('div');
+    heart.className = 'heart-float';
+    heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+    heart.style.left = Math.random() * 100 + '%';
+    heart.style.bottom = '-50px';
+    heart.style.animationDelay = Math.random() * 3 + 's';
+    heart.style.animationDuration = (Math.random() * 12 + 10) + 's';
+    heart.style.fontSize = (Math.random() * 28 + 20) + 'px';
+    container.appendChild(heart);
+    activeHearts++;
+    
+    setTimeout(() => {
+      heart.remove();
+      activeHearts--;
+    }, 16000);
+  }, 600);
+}
+
+createFloatingHearts();
+
+// Afficher l'historique des scores
+function showHistory() {
+  const history = JSON.parse(localStorage.getItem('intimateGameScores') || '[]');
+  const historyDiv = document.getElementById('historyList');
+  
+  if (history.length === 0) {
+    historyDiv.innerHTML = '<em style="opacity:0.7;">Aucun historique pour le moment</em>';
+    return;
+  }
+  
+  const last3 = history.slice(-3).reverse();
+  const best = history.reduce((max, entry) => entry.score > max.score ? entry : max, {score: 0});
+  
+  let html = '';
+  
+  last3.forEach((entry) => {
+    const modeIcon = entry.modeJeu === 'distance' ? '📱' : '👫';
+    html += `
+      <div class="score-entry">
+        <div><strong>${escapeHtml(entry.p1)} & ${escapeHtml(entry.p2)}</strong> ${modeIcon}</div>
+        <div>Score: <strong style="color:var(--peche);">${entry.score}%</strong> • ${entry.questions} questions</div>
+        <div style="font-size:0.9em;opacity:0.7;">${entry.date}</div>
+      </div>
+    `;
+  });
+  
+  if (best.score > 0) {
+    html += `
+      <div style="margin-top:20px;padding:15px;background:rgba(255,107,157,0.2);border-radius:8px;border:2px solid var(--rose);">
+        <div><strong>🏆 Meilleur score</strong></div>
+        <div style="font-size:1.3em;color:var(--peche);font-weight:700;">${best.score}%</div>
+        <div style="font-size:0.9em;">${escapeHtml(best.p1)} & ${escapeHtml(best.p2)}</div>
+      </div>
+    `;
+  }
+  
+  historyDiv.innerHTML = html;
+}
+
+// Sauvegarder le score dans localStorage
+function saveScore(percentage, mode) {
+  const entry = {
+    date: new Date().toLocaleString('fr-FR'),
+    p1: partner1,
+    p2: partner2,
+    questions: selectedQuestionCount,
+    score: percentage,
+    modeJeu: mode || selectedMode
+  };
+  
+  let history = JSON.parse(localStorage.getItem('intimateGameScores') || '[]');
+  history.push(entry);
+  
+  if (history.length > 10) {
+    history = history.slice(-10);
+  }
+  
+  localStorage.setItem('intimateGameScores', JSON.stringify(history));
+}
+
+// Gestion clavier
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+    e.preventDefault();
+  }
+});
+
+// Confirmation avant fermeture
+window.addEventListener('beforeunload', function(e) {
+  if (Object.keys(answers1).length > 0 && !document.getElementById('resultsScreen').classList.contains('hidden')) {
+    return;
+  }
+  
+  if (Object.keys(answers1).length > 0 || Object.keys(answers2).length > 0) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+// Charger l'historique au démarrage
+window.addEventListener('load', showHistory);
+  // ============================================================================
+// MODULE 5 : MODE ENSEMBLE
+// ============================================================================
+
+function selectMode(mode) {
+  selectedMode = mode;
+  document.getElementById('modeChoiceScreen').classList.add('hidden');
+  document.getElementById('questionCountScreen').classList.remove('hidden');
+  
+  const badge = document.getElementById('modeBadge');
+  if (mode === 'ensemble') {
+    badge.innerHTML = '<span class="mode-badge ensemble">👫 Ensemble</span>';
+  } else {
+    badge.innerHTML = '<span class="mode-badge distance">📱 À distance</span>';
+  }
+}
+
+function backToModeChoice() {
+  document.getElementById('questionCountScreen').classList.add('hidden');
+  document.getElementById('modeChoiceScreen').classList.remove('hidden');
+}
+
+function selectQuestionCount(n) {
+  selectedQuestionCount = n;
+  document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  setTimeout(() => {
+    document.getElementById('questionCountScreen').classList.add('hidden');
+    
+    if (selectedMode === 'ensemble') {
+      document.getElementById('welcomeScreen').classList.remove('hidden');
+    } else {
+      document.getElementById('distanceWelcomeScreen').classList.remove('hidden');
+    }
+  }, 300);
+}
+
+function backToLevelChoice() {
+  if (selectedMode === 'ensemble') {
+    document.getElementById('welcomeScreen').classList.add('hidden');
+  } else {
+    document.getElementById('distanceWelcomeScreen').classList.add('hidden');
+  }
+  document.getElementById('questionCountScreen').classList.remove('hidden');
+}
+
+function startQuiz() {
+  partner1 = document.getElementById('partner1Name').value.trim();
+  partner2 = document.getElementById('partner2Name').value.trim();
+  
+  if (!partner1 || !partner2) {
+    alert("Entre les deux prénoms s'il te plaît 💕");
+    return;
+  }
+  
+  if (partner1.length < 2 || partner2.length < 2) {
+    alert("Les prénoms doivent contenir au moins 2 caractères 💕");
+    return;
+  }
+
+  questions = shuffleArray([...allQuestions]).slice(0, selectedQuestionCount);
+
+  document.getElementById('welcomeScreen').classList.add('hidden');
+  document.getElementById('quiz1Screen').classList.remove('hidden');
+  document.getElementById('quiz1Title').textContent = `${partner1}, à toi ! 💖 (${questions.length} questions)`;
+  renderQuestions('questions1Container', 1);
+}
+
+function renderQuestions(containerId, quizNum) {
+  const cont = document.getElementById(containerId);
+  cont.innerHTML = '';
+  
+  questions.forEach((q, i) => {
+    const d = document.createElement('div');
+    d.className = 'question-card';
+    d.style.animationDelay = i * 0.05 + 's';
+    
+    const intensityEmoji = q.intensity === 1 ? '🌱' : q.intensity === 2 ? '🔥' : '💋';
+    
+    d.innerHTML = `
+      <div style="font-weight:600;color:var(--peche);margin-bottom:8px;">
+        Question ${i + 1}/${questions.length} ${intensityEmoji}
+      </div>
+      <div style="margin:12px 0;font-size:1.05em;">${escapeHtml(q.text)}</div>
+      <input 
+        type="text" 
+        id="q${quizNum}_${q.id}" 
+        placeholder="Ta réponse..." 
+        oninput="updateProgress(${quizNum})"
+        maxlength="200"
+        autocomplete="off"
+      >
+    `;
+    cont.appendChild(d);
+  });
+}
+
+function updateProgress(quizNum) {
+  let completed = 0;
+  questions.forEach(q => {
+    const input = document.getElementById(`q${quizNum}_${q.id}`);
+    if (input?.value.trim()) completed++;
+  });
+  
+  const percentage = Math.round((completed / questions.length) * 100);
+  document.getElementById(`progress${quizNum}`).style.width = percentage + '%';
+  document.getElementById(`progress${quizNum}Text`).textContent = percentage + '% complété';
+  
+  const submitBtn = document.getElementById(`submit${quizNum}Btn`);
+  if (submitBtn) {
+    submitBtn.disabled = completed < questions.length;
+  }
+}
+
+function submitQuiz1() {
+  answers1 = {};
+  let allAnswered = true;
+  
+  questions.forEach(q => {
+    const value = document.getElementById(`q1_${q.id}`)?.value.trim();
+    if (!value) {
+      allAnswered = false;
+    } else {
+      answers1[q.id] = value;
+    }
+  });
+  
+  if (!allAnswered) {
+    alert("Réponds à toutes les questions s'il te plaît 💕");
+    return;
+  }
+
+  document.getElementById('quiz1Screen').classList.add('hidden');
+  document.getElementById('transitionScreen').classList.remove('hidden');
+  document.getElementById('transitionMessage').textContent = `${partner1} a terminé ! ${partner2}, à ton tour ! 💖`;
+}
+
+function startQuiz2() {
+  document.getElementById('transitionScreen').classList.add('hidden');
+  document.getElementById('quiz2Screen').classList.remove('hidden');
+  document.getElementById('quiz2Title').textContent = `${partner2}, à toi ! 💖 (${questions.length} questions)`;
+  renderQuestions('questions2Container', 2);
+}
+
+function submitQuiz2() {
+  answers2 = {};
+  let allAnswered = true;
+  
+  questions.forEach(q => {
+    const value = document.getElementById(`q2_${q.id}`)?.value.trim();
+    if (!value) {
+      allAnswered = false;
+    } else {
+      answers2[q.id] = value;
+    }
+  });
+  
+  if (!allAnswered) {
+    alert("Réponds à toutes les questions s'il te plaît 💕");
+    return;
+  }
+  
+  calculateResults();
+  }
+  // ============================================================================
+// MODULE 6 : MODE DISTANCE
+// ============================================================================
+
+function detectSessionFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const sessionId = urlParams.get('session');
+  
+  if (sessionId) {
+    loadExistingSession(sessionId);
+  }
+}
+
+async function loadExistingSession(sessionId) {
+  const session = await getDistanceSession(sessionId);
+  
+  if (!session) {
+    alert("Session non trouvée ou expirée");
+    return;
+  }
+  
+  if (session.expired) {
+    alert("Cette session a expiré (plus de 72h). Créez une nouvelle partie !");
+    return;
+  }
+  
+  if (session.statut === 'complete') {
+    // Les deux ont joué, afficher les résultats
+    loadSessionResults(session);
+    return;
+  }
+  
+  // Partenaire 2 arrive pour jouer
+  currentSessionId = sessionId;
+  partner1 = session.partenaire1;
+  partner2 = session.partenaire2;
+  questions = allQuestions.filter(q => session.questions.includes(q.id));
+  selectedQuestionCount = session.nombreQuestions;
+  selectedMode = 'distance';
+  
+  document.getElementById('modeChoiceScreen').classList.add('hidden');
+  document.getElementById('joinSessionScreen').classList.remove('hidden');
+  
+  document.getElementById('sessionInfo').innerHTML = `
+    <div style="font-size:1.2em; line-height:1.6;">
+      <p style="margin:15px 0;">
+        <strong style="color:var(--peche);">${escapeHtml(session.partenaire1)}</strong> 
+        attend tes réponses ! ❤️
+      </p>
+      <p style="opacity:0.8;">
+        Niveau : <strong>${session.niveau}</strong> (${session.nombreQuestions} questions)
+      </p>
+    </div>
+  `;
+}
+
+function joinSession() {
+  document.getElementById('joinSessionScreen').classList.add('hidden');
+  document.getElementById('distanceQuizScreen').classList.remove('hidden');
+  document.getElementById('distanceQuizTitle').textContent = `${partner2}, à toi ! 💖 (${questions.length} questions)`;
+  renderDistanceQuestions();
+}
+
+function startDistanceQuiz() {
+  partner1 = document.getElementById('distancePartner1Name').value.trim();
+  partner2 = document.getElementById('distancePartner2Name').value.trim();
+  
+  if (!partner1 || !partner2) {
+    alert("Entre les deux prénoms s'il te plaît 💕");
+    return;
+  }
+  
+  if (partner1.length < 2 || partner2.length < 2) {
+    alert("Les prénoms doivent contenir au moins 2 caractères 💕");
+    return;
+  }
+
+  questions = shuffleArray([...allQuestions]).slice(0, selectedQuestionCount);
+
+  document.getElementById('distanceWelcomeScreen').classList.add('hidden');
+  document.getElementById('distanceQuizScreen').classList.remove('hidden');
+  document.getElementById('distanceQuizTitle').textContent = `${partner1}, à toi ! 💖 (${questions.length} questions)`;
+  renderDistanceQuestions();
+}
+
+function renderDistanceQuestions() {
+  const cont = document.getElementById('distanceQuestionsContainer');
+  cont.innerHTML = '';
+  
+  questions.forEach((q, i) => {
+    const d = document.createElement('div');
+    d.className = 'question-card';
+    d.style.animationDelay = i * 0.05 + 's';
+    
+    const intensityEmoji = q.intensity === 1 ? '🌱' : q.intensity === 2 ? '🔥' : '💋';
+    
+    d.innerHTML = `
+      <div style="font-weight:600;color:var(--peche);margin-bottom:8px;">
+        Question ${i + 1}/${questions.length} ${intensityEmoji}
+      </div>
+      <div style="margin:12px 0;font-size:1.05em;">${escapeHtml(q.text)}</div>
+      <input 
+        type="text" 
+        id="qd_${q.id}" 
+        placeholder="Ta réponse..." 
+        oninput="updateDistanceProgress()"
+        maxlength="200"
+        autocomplete="off"
+      >
+    `;
+    cont.appendChild(d);
+  });
+}
+
+function updateDistanceProgress() {
+  let completed = 0;
+  questions.forEach(q => {
+    const input = document.getElementById(`qd_${q.id}`);
+    if (input?.value.trim()) completed++;
+  });
+  
+  const percentage = Math.round((completed / questions.length) * 100);
+  document.getElementById('distanceProgress').style.width = percentage + '%';
+  document.getElementById('distanceProgressText').textContent = percentage + '% complété';
+  
+  const submitBtn = document.getElementById('submitDistanceBtn');
+  if (submitBtn) {
+    submitBtn.disabled = completed < questions.length;
+  }
+}
+
+async function submitDistanceQuiz() {
+  const myAnswers = {};
+  let allAnswered = true;
+  
+  questions.forEach(q => {
+    const value = document.getElementById(`qd_${q.id}`)?.value.trim();
+    if (!value) {
+      allAnswered = false;
+    } else {
+      myAnswers[q.id] = value;
+    }
+  });
+  
+  if (!allAnswered) {
+    alert("Réponds à toutes les questions s'il te plaît 💕");
+    return;
+  }
+  
+  if (currentSessionId) {
+    // Partenaire 2 complète la session
+    answers1 = {}; 
+    answers2 = myAnswers;
+    await completeDistanceSessionWithAnswers();
+  } else {
+    // Partenaire 1 crée la session
+    answers1 = myAnswers;
+    await createSessionAndShare();
+  }
+}
+
+async function createSessionAndShare() {
+  const sessionData = {
+    partenaire1: partner1,
+    partenaire2: partner2,
+    nombreQuestions: selectedQuestionCount,
+    niveau: selectedQuestionCount === 20 ? 'Débutant' : 
+            selectedQuestionCount === 50 ? 'Intermédiaire' :
+            selectedQuestionCount === 100 ? 'Avancé' : 'Extrême',
+    questions: questions.map(q => q.id),
+    reponses: answers1
+  };
+  
+  const sessionId = await createDistanceSession(sessionData);
+  
+  if (!sessionId) {
+    alert("Erreur lors de la création de la session. Vérifiez votre connexion.");
+    return;
+  }
+  
+  currentSessionId = sessionId;
+  const shareUrl = window.location.origin + window.location.pathname + '?session=' + sessionId;
+  
+  document.getElementById('distanceQuizScreen').classList.add('hidden');
+  document.getElementById('shareLinkScreen').classList.remove('hidden');
+  document.getElementById('partnerNameToShare').textContent = partner2;
+  document.getElementById('shareLink').textContent = shareUrl;
+  document.getElementById('waitingPartnerName').textContent = partner2;
+  
+  // Démarrer la vérification automatique toutes les 10 secondes
+  setTimeout(startAutoCheck, 10000);
+}
+
+function copyShareLink() {
+  const link = document.getElementById('shareLink').textContent;
+  navigator.clipboard.writeText(link).then(() => {
+    alert('✅ Lien copié ! Envoie-le à ton partenaire.');
+  }).catch(() => {
+    alert('Sélectionne et copie le lien manuellement');
+  });
+}
+
+let autoCheckInterval = null;
+
+function startAutoCheck() {
+  document.getElementById('waitingForPartner').classList.remove('hidden');
+  autoCheckInterval = setInterval(checkSessionStatus, 10000);
+}
+
+async function checkSessionStatus() {
+  if (!currentSessionId) return;
+  
+  const session = await getDistanceSession(currentSessionId);
+  
+  if (session && session.statut === 'complete') {
+    clearInterval(autoCheckInterval);
+    loadSessionResults(session);
+  }
+}
+
+async function completeDistanceSessionWithAnswers() {
+  const session = await getDistanceSession(currentSessionId);
+  answers1 = session.reponses_partenaire1;
+  
+  const score = calculateScoreFromAnswers(answers1, answers2);
+  
+  await completeDistanceSession(currentSessionId, {
+    reponses: answers2,
+    score: score
+  });
+  
+  loadSessionResults(await getDistanceSession(currentSessionId));
+}
+
+function loadSessionResults(session) {
+  partner1 = session.partenaire1;
+  partner2 = session.partenaire2;
+  questions = allQuestions.filter(q => session.questions.includes(q.id));
+  answers1 = session.reponses_partenaire1;
+  answers2 = session.reponses_partenaire2;
+  selectedMode = 'distance';
+  
+  document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+  displayResults(session.score);
+  }
