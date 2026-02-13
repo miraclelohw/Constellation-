@@ -6,12 +6,12 @@
 // Paramètres du projet → Vos applications → Configuration SDK
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDDR-vXZpIwRhwXFgcPo7himnjd4Dontag",
-  authDomain: "quiz-intime.firebaseapp.com",
-  projectId: "quiz-intime",
-  storageBucket: "quiz-intime.firebasestorage.app",
-  messagingSenderId: "1065731737389",
-  appId: "1:1065731737389:web:5a8780bf76953b8867b5a4"
+  apiKey: "AIzaSyAO441k9SSfYxRUDd25ArAhWicxkvgo4Cs",
+  authDomain: "intime-5b920.firebaseapp.com",
+  projectId: "intime-5b920",
+  storageBucket: "intime-5b920.firebasestorage.app",
+  messagingSenderId: "188431588616",
+  appId: "1:188431588616:web:926c9b20a499b22371e0bd"
 };
 
 // ============================================================================
